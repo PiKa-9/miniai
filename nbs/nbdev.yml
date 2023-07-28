@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "miniai"
+  site-url: "https://PiKa-9.github.io/miniai"
+  description: "Fasta Dl course part2"
+  repo-branch: master
+  repo-url: "https://github.com/PiKa-9/miniai"
