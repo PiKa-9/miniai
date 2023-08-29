@@ -64,7 +64,7 @@ class DeviceCB(Callback):
     def __init__(self, device=def_device): self.device=device
     def before_fit(self, learn): 
         if hasattr(learn.model, 'to'): learn.model.to(self.device)
-    def before_batch(self, learn): to_device(learn.batch, self.device)
+    def before_batch(self, learn): learn.batch = to_device(learn.batch, self.device)
 
 # %% ../nbs/#callbacks.ipynb 7
 class TrainCB(Callback):

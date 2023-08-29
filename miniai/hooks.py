@@ -9,17 +9,16 @@ import fastcore.all as fc
 from functools import partial
 
 from .plotting import *
-from .learner import *
 from .callbacks import to_cpu
 
-# %% ../nbs/#hooks.ipynb 9
+# %% ../nbs/#hooks.ipynb 10
 def set_seed(seed, deterministic=False):
     torch.use_deterministic_algorithms(deterministic)
     torch.manual_seed(seed)
     np.random.seed(seed)
     random.seed(seed)
 
-# %% ../nbs/#hooks.ipynb 10
+# %% ../nbs/#hooks.ipynb 11
 def get_hist(hook, rng=None):
     """rng: tuple (i1, i2), which tells the range of iterations from which we get stats"""
     if rng is None: return torch.flip(torch.stack(hook.stats[2]).T, [0]).log1p()
@@ -30,7 +29,7 @@ def get_dead_ratio(hook, rng=None):
     res = h[:, 0]/(h[:, 1:].sum(1))
     return res
 
-# %% ../nbs/#hooks.ipynb 11
+# %% ../nbs/#hooks.ipynb 12
 class Hook:
     def __init__(self, layer, f): self.hook = layer.register_forward_hook(partial(f, self))
     def remove(self): self.hook.remove()
@@ -73,10 +72,10 @@ class Hooks(list):
             ax[l].plot(get_dead_ratio(self[l], rng)); ax[l].set_title(f'{l}_{self.layers_names[l]}')
         plt.tight_layout(); plt.show()
 
-# %% ../nbs/#hooks.ipynb 12
-def append_stats(hook, mod, inp, out):
+# %% ../nbs/#hooks.ipynb 13
+def append_stats(hook, mod, inp, out, hist_params=[40, 0, 10]):
     if not hasattr(hook, 'stats'): hook.stats = [[], [], []]
     acts = to_cpu(out)
     hook.stats[0].append(acts.mean())
     hook.stats[1].append(acts.std())
-    hook.stats[2].append(acts.abs().histc(40, 0, 10))
+    hook.stats[2].append(acts.abs().histc(*hist_params))

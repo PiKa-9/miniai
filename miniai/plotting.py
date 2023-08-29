@@ -9,15 +9,17 @@ import fastcore.all as fc
 
 # %% ../nbs/#plotting.ipynb 2
 @fc.delegates(plt.Axes.imshow)
-def show_image(img, ax=None, shape=None, figsize=(1.5, 1.5), title=None, ax_off=True, **kwargs):
+def show_image(img, ax=None, figsize=(1.5, 1.5), title=None, ax_off=True, **kwargs):
     if img is None: ax.axis('off'); return ax
     
     if not isinstance(img, np.ndarray): img = np.array(img)
+    img = img.squeeze()
+    if len(img.shape)==3 and img.shape[0]<=3: img = np.transpose(img, axes=[-2, -1, -3])
+    
     if ax is None: fig, ax = plt.subplots(figsize=figsize)
     if title is not None: ax.set_title(title)
-    if shape is None: shape = img.shape
     if ax_off: ax.axis('off')
-    ax.imshow(img.reshape(shape), **kwargs)
+    ax.imshow(img, **kwargs);
     return ax
 
 # %% ../nbs/#plotting.ipynb 3
@@ -36,11 +38,11 @@ def subplots(n=1, nrows=None, ncols=None, figsize=None, imsize=None, **kwargs):
 
 # %% ../nbs/#plotting.ipynb 4
 @fc.delegates(subplots)
-def show_images(images=[], titles=None, shape=None, imsize=(2, 2), cmap=None, **kwargs):
+def show_images(images=[], titles=None, imsize=(2, 2), cmap=None, **kwargs):
     fig, ax = subplots(n=len(images), imsize=imsize, **kwargs)
     for i, axis in enumerate(ax):
         if i < len(images):
             show_image(images[i], 
-                       axis, shape=shape, 
+                       axis,
                        title=(None if titles is None else titles[i]), figsize=imsize, cmap=cmap)
         else: axis.axis('off')
